@@ -139,11 +139,11 @@ class ArgsParser
     private function writeValue(Option $option, string $key, $value, bool $arrayWrite): void
     {
         if ($key === "@") {
-            $keys = $option->getShort();
+            $keys = $option->getShort(false);
         } elseif ($key === "@@") {
-            $keys = $option->getLong();
+            $keys = $option->getLong(false);
         } elseif ($key === "@@@") {
-            $keys = $option->getAll();
+            $keys = $option->getAll(false);
         } else {
             if ($arrayWrite) {
                 $current = $this->data[$key] ?? [];

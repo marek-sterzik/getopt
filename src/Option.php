@@ -125,19 +125,32 @@ class Option
         return $this->isArgument;
     }
 
-    public function getShort(): array
+    public function getShort(bool $includeWildcard = true): array
     {
         return $this->short;
     }
 
-    public function getLong(): array
+    public function getLong(bool $includeWildcard = true): array
     {
         return $this->long;
     }
 
-    public function getAll(): array
+    private function processWildcard(array $data, bool $includeWildcard): array
     {
-        return array_merge($this->short, $this->long);
+        if ($includeWildcad) {
+            return $data;
+        }
+        return array_filter($data, function ($item) {
+            if ($item === '@' || $item === '@@') {
+                return false;
+            }
+            return true;
+        });
+    }
+
+    public function getAll(bool $includeWildcard = true): array
+    {
+        return array_merge($this->getShort($includeWildcard), $this->getLong($includeWildcard));
     }
 
     public function getMin(): int
