@@ -14,11 +14,7 @@ class ArgsException extends Exception
 
     public function __construct(string $argsErrorMessage, ?int $argsErrorPosition = null)
     {
-        if ($argsErrorPosition !== null) {
-            $message = sprintf("Argument error at argument %d: %s ", $argsErrorPosition, $argsErrorMessage);
-        } else {
-            $message = sprintf("Argument error: %s ", $argsErrorMessage);
-        }
+        $message = sprintf("Argument error: %s ", $argsErrorMessage);
         parent::__construct($message);
         $this->argsErrorMessage = $argsErrorMessage;
         $this->argsErrorPosition = $argsErrorPosition;
