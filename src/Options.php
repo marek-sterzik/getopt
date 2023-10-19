@@ -4,6 +4,8 @@ namespace SPSOstrov\GetOpt;
 
 class Options
 {
+    const DEFAULT_ARG_DEF = '$args*[__args__]';
+
     /** @var array<string,Option> */
     private $map = [];
 
@@ -13,6 +15,9 @@ class Options
     /** @var Option[] */
     private $options = [];
 
+    /** @var Option|null */
+    private $defaultArgOption = null;
+
     /** @var bool */
     private $strictMode = true;
 
@@ -21,6 +26,7 @@ class Options
 
     public function __construct(array $options, bool $strictMode = true)
     {
+        
         $this->strictMode = $strictMode;
         foreach ($options as $option) {
             $this->registerOption($option);
@@ -95,6 +101,16 @@ class Options
         if ($argNumber < 0) {
             return null;
         }
+        if (empty($this->argMap)) {
+            if ($this->defaultArgOption === null) {
+                $this->defaultArgOption = new Option(self::DEFAULT_ARG_DEF);
+            }
+            $max = $this->defaultArgOption->getMax();
+            if ($max !== null && $max < $argNumber) {
+                return null;
+            }
+            return $this->defaultArgOption;
+        }
         $initCache = [
             "n" => 0,
             "oi" => 0,
@@ -159,6 +175,13 @@ class Options
 
     public function getAll(): array
     {
-        return $this->options;
+        $options = $this->options;
+        if (empty($this->argMap)) {
+            $option = $this->getOptionForArg(0);
+            if ($option !== null) {
+                $options[] = $option;
+            }
+        }
+        return $options;
     }
 }
