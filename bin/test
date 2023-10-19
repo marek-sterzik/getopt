@@ -1,0 +1,30 @@
+#!/usr/bin/env php
+<?php
+
+namespace SPSOstrov\GetOpt;
+
+require_once dirname(__DIR__) . "/vendor/autoload.php";
+
+array_shift($argv);
+
+$options = [
+    'a|append              append commit',
+    'm|message:            commit message',
+    'o|optional?           optional argument',
+    'A|array*              array argument',
+    'yes|no{1}[enabled=@]  enable',
+    '$command:             command',
+    '$args{3}              command-args',
+];
+
+foreach ($options as $option) {
+    echo $option."\n";
+}
+echo "\n";
+
+$options = new Options($options);
+$options->setStrictMode(true);
+
+$parsed = $options->parseArgs($argv);
+echo "----------------------------------------\n";
+var_dump($parsed);

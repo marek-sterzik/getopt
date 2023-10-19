@@ -1,0 +1,20 @@
+{
+    "name": "spsostrov/getopt",
+    "description": "The SPŠ Ostrov GetOpt library",
+    "license": "MIT",
+    "homepage": "https://github.com/marek-sterzik/getopt",
+    "authors": [
+        {
+            "name": "Marek Sterzik",
+            "email": "sterzik@spsostrov.cz"
+        }
+    ],
+    "autoload" : {
+        "psr-4": {
+            "SPSOstrov\\GetOpt\\": "src"
+        }
+    },
+    "require": {
+        "php": ">=7.1"
+    }
+}
