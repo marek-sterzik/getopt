@@ -22,7 +22,6 @@ class OptionParser
             '?' => 'loadArgType',
             '*' => 'loadArgType',
             '~' => 'loadArgType',
-            'help' => 'loadDescription',
             'space' => 'loadDescription',
             '=' => 'loadChecker',
             '[' => 'loadWriteRules',
@@ -32,7 +31,6 @@ class OptionParser
         if ($token !== null) {
             $this->unexpectedToken($token);
         }
-
 
         return $this->data;
 
@@ -167,19 +165,42 @@ class OptionParser
 
     private function loadDescription(): void
     {
+        $descriptionDescriptor = ["default" => null, "byOptions" => []];
+
         $token = $this->readToken(false);
         while ($token !== null && $token[0] === 'space') {
             $token = $this->readNextToken();
         }
-        $description = null;
+        
         if ($token !== null) {
-            if ($token[0] !== 'help') {
-                $this->unexpectedToken($token);
+            if ($token[0] === 'help') {
+                $descriptionDescriptor['default'] = rtrim($token[1]);
             }
-            $description = $token[1];
-            $this->readToken();
+            $token = $this->readNextToken();
+            while ($token !== null) {
+                if ($token[0] !== '[') {
+                    $this->unexpectedToken($token);
+                }
+                $this->readToken();
+                $optionList = $this->loadOptionList();
+                $token = $this->readToken(false);
+                if ($token === null || $token[0] !== ']') {
+                    $this->unexpectedToken($token);
+                }
+                $token = $this->readNextToken();
+                if ($token !== null && $token[0] === 'space') {
+                    $token = $this->readNextToken();
+                }
+                if ($token !== null || $token[0] === 'help') {
+                    $optionList['description'] = rtrim($token[1]);
+                    $token = $this->readNextToken();
+                } else {
+                    $optionList['description'] = null;
+                }
+                $descriptionDescriptor['byOptions'][] = $optionList;
+            }
         }
-        $this->merge(["description" => $description]);
+        $this->merge(["help" => $descriptionDescriptor]);
     }
 
     private function putQuantity(int $min, ?int $max): void

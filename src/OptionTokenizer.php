@@ -14,13 +14,13 @@ class OptionTokenizer
         $quoteChar = null;
         $i = 0;
         $read = true;
+        $state = "normal";
         while ($i < $n) {
             $char = substr($optionDescriptor, $i, 1);
-            if ($accType === null) {
+            if ($accType === null && in_array($state, ['normal', 'helpoptions'])) {
                 if (ctype_space($char)) {
-                    $acc = $char;
-                    $accType = "space";
-                    $accIndex = $i;
+                    $state = "help";
+                    $read = false;
                 } elseif (preg_match('/[a-zA-Z0-9_.-]/', $char)) {
                     $acc = $char;
                     $accType = "identifier";
@@ -35,9 +35,44 @@ class OptionTokenizer
                     $acc = $char;
                     $accIndex = $i;
                 } elseif (strpos(self::STANDALONE_CHARS, $char) !== false) {
-                    yield [$char, $char, $i];
+                    if ($char === '[' && $state === 'helpoptions') {
+                        yield ['error', $char, $i];
+                    } else {
+                        yield [$char, $char, $i];
+                        if ($char === ']' && $state === 'helpoptions') {
+                            $state = 'help';
+                        }
+                    }
                 } else {
                     yield ["error", $char, $i];
+                }
+            } elseif ($state === 'help') {
+                if ($char === '[') {
+                    if ($accType !== null) {
+                        yield [$accType, $acc, $accIndex];
+                        $accType = null;
+                        $acc = "";
+                    }
+                    yield [$char, $char, $i];
+                    $state = 'helpoptions';
+                } elseif (($accType === null || $accType === 'space') && ctype_space($char)) {
+                    if ($accType === null) {
+                        $accType = "space";
+                        $acc = '';
+                        $accIndex = $i;
+                    }
+                    $acc .= $char;
+                } else {
+                    if ($accType !== null && $accType !== 'help') {
+                        yield [$accType, $acc, $accIndex];
+                        $accType = null;
+                        $acc = "";
+                    }
+                    if ($accType === null) {
+                        $accType = "help";
+                        $accIndex = $i;
+                    }
+                    $acc .= $char;
                 }
             } elseif ($accType === "quote") {
                 $acc .= $char;
@@ -78,17 +113,6 @@ class OptionTokenizer
                     $accIndex = null;
                     $read = false;
                 }
-            } elseif ($accType === "space") {
-                if (ctype_space($char)) {
-                    $acc .= $char;
-                } else {
-                    yield [$accType, $acc, $accIndex];
-                    $accIndex = $i;
-                    $acc = $char;
-                    $accType = "help";
-                }
-            } elseif ($accType === "help") {
-                $acc .= $char;
             }
             if ($read) {
                 $i++;

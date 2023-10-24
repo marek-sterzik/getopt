@@ -140,7 +140,7 @@ class ArgsTokenizer
                     $stateOption = $option;
                 }
             } elseif ($state === 'optional-arg') {
-                if (substr($currentArg, 0, 1) === '-') {
+                if (!$this->options->isStandaloneOptionalArgAllowed() || substr($currentArg, 0, 1) === '-') {
                     yield ["option", $stateOption, null, $index - 1];
                     $stateOption = null;
                     $state = "init";

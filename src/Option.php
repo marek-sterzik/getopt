@@ -39,9 +39,8 @@ class Option
     /** @var array */
     private $rules;
 
-    /** @var string|null */
-    private $description;
-
+    /** @var array */
+    private $help;
 
     public function __construct(string $optionDescription)
     {
@@ -55,7 +54,16 @@ class Option
         $this->max = $decoded['max'] ?? null;
         $this->checker = $decoded['checker'] ?? null;
         $this->rules = $decoded['rules'] ?? [['from' => '$', 'to' => ['@@@'], 'type' => '$']];
-        $this->description = $decoded['description'] ?? null;
+        $this->help = $this->decodeHelp($decoded['help'] ?? ['default' => null, 'byOptions' => []]);
+
+        if ($this->isArgument) {
+            if (count($this->short) + count($this->long) > 1) {
+                throw new ParserException("Argument is allowed to have only one single name");
+            }
+            if (in_array('@', $this->short) || in_array('@@', $this->long)) {
+                throw new ParserException("Wildcard names are not allowed for arguments");
+            }
+        }
 
         if ($this->argType === null) {
             if ($this->min === null && $this->max === null) {
@@ -95,13 +103,6 @@ class Option
                 }
             } 
         }
-
-        if ($this->description !== null) {
-            $this->description = trim($this->description);
-            if ($this->description === "") {
-                $this->description = null;
-            }
-        }
     }
 
     public function __clone()
@@ -127,17 +128,17 @@ class Option
 
     public function getShort(bool $includeWildcard = true): array
     {
-        return $this->short;
+        return $this->processWildcard($this->short, $includeWildcard);
     }
 
     public function getLong(bool $includeWildcard = true): array
     {
-        return $this->long;
+        return $this->processWildcard($this->long, $includeWildcard);
     }
 
     private function processWildcard(array $data, bool $includeWildcard): array
     {
-        if ($includeWildcad) {
+        if ($includeWildcard) {
             return $data;
         }
         return array_filter($data, function ($item) {
@@ -224,6 +225,11 @@ class Option
         return implode(", ", $representatives);
     }
 
+    public function getHelp(): array
+    {
+        return $this->help;
+    }
+
     private function decorateOption(string $name): string
     {
         if ($this->isArgument()) {
@@ -235,5 +241,41 @@ class Option
                 return '--' . $name;
             }
         }
+    }
+
+    private function decodeHelp(array $helpDescriptor): array
+    {
+        $help = [["short" => [], "long" => [], "description" => $helpDescriptor['default']]];
+        $short = array_fill_keys($this->getShort(false), true);
+        $long = array_fill_keys($this->getLong(false), true);
+        foreach ($helpDescriptor['byOptions'] as $descriptor) {
+            $helpRecord = [
+                'short' => $this->pickOpts($short, $descriptor['short']),
+                'long' => $this->pickOpts($long, $descriptor['long']),
+                'description' => $descriptor['description'],
+            ];
+            if (!empty($helpRecord['short'])  || !empty($helpRecord['long'])) {
+                $help[] = $helpRecord;
+            }
+        }
+        $help[0]['short'] = $this->pickOpts($short, ['@']);
+        $help[0]['long'] = $this->pickOpts($long, ['@@']);
+        if (empty($help[0]['short']) && empty($help[0]['long'])) {
+            array_shift($help);
+        }
+        return $help;
+    }
+
+    private function pickOpts(array &$opts, array $template): array
+    {
+        $template = array_fill_keys($template, true);
+        $pickedOpts = [];
+        foreach (array_keys($opts) as $opt) {
+            if (isset($template[$opt]) || isset($template['@']) || isset($template['@@'])) {
+                $pickedOpts[] = $opt;
+                unset($opts[$opt]);
+            }
+        }
+        return $pickedOpts;
     }
 }

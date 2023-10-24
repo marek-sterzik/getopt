@@ -21,13 +21,17 @@ class Options
     /** @var bool */
     private $strictMode = true;
 
+    /** @var bool */
+    private $standaloneOptionalArgAllowed = false;
+
     /** @var array */
     private $argCache = null;
 
-    public function __construct(array $options, bool $strictMode = true)
+    public function __construct(array $options, bool $strictMode = true, bool $standaloneOptionalArgAllowed = false)
     {
         
         $this->strictMode = $strictMode;
+        $this->standaloneOptionalArgAllowed = $standaloneOptionalArgAllowed;
         foreach ($options as $option) {
             $this->registerOption($option);
         }
@@ -76,6 +80,28 @@ class Options
         $this->options[] = $option;
     }
 
+    public function getOptionsHelp(): array
+    {
+        $help = [];
+        foreach ($this->options as $option) {
+            if (!$option->isArgument()) {
+                $help = array_merge($help, $option->getHelp());
+            }
+        }
+        return $help;
+    }
+
+    public function getArgsHelp(): array
+    {
+        $help = [];
+        foreach ($this->options as $option) {
+            if ($option->isArgument()) {
+                $help = array_merge($help, $option->getHelp());
+            }
+        }
+        return $help;
+    }
+
     public function getStrictMode(): bool
     {
         return $this->strictMode;
@@ -85,6 +111,16 @@ class Options
     {
         $this->strictMode = $strictMode;
         return $this;
+    }
+
+    public function isStandaloneOptionalArgAllowed(): bool
+    {
+        return $this->standaloneOptionalArgAllowed;
+    }
+
+    public function setStandaloneOptionalArgAllowed(bool $standaloneOptionalArgAllowed): self
+    {
+        return $this->standaloneOptionalArgAllowed = $standaloneOptionalArgAllowed;
     }
 
     public function getArgTypeFor(string $option): ?string
