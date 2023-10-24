@@ -17,9 +17,11 @@ abstract class Formatter implements FormatterInterface
         return self::$formatter;
     }
 
-    public static function setDefault(?FormatterInterface $formatter = null): void
+    public static function setDefault(?FormatterInterface $formatter = null): ?FormatterInterface
     {
+        $oldFormatter = self::$formatter;
         self::$formatter = $formatter ?? (new DefaultFormatter());
+        return $oldFormatter;
     }
 
     abstract public function formatHelp(string $argv0, ?string $args, ?string $options): string;
