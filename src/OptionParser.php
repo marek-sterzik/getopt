@@ -175,15 +175,29 @@ class OptionParser
         if ($token !== null) {
             if ($token[0] === 'help') {
                 $descriptionDescriptor['default'] = rtrim($token[1]);
+                $token = $this->readNextToken();
             }
-            $token = $this->readNextToken();
             while ($token !== null) {
                 if ($token[0] !== '[') {
                     $this->unexpectedToken($token);
                 }
-                $this->readToken();
-                $optionList = $this->loadOptionList();
-                $token = $this->readToken(false);
+                $token = $this->readNextToken();
+                if ($token === null || $token[0] !== '=') {
+                    $optionList = $this->loadOptionList();
+                    $token = $this->readToken(false);
+                } else {
+                    $optionList = ['short' => ['@'], 'long' => ['@@']];
+                }
+                if ($token !== null && $token[0] === '=') {
+                    $token = $this->readNextToken();
+                    if ($token === null || $token[0] !== 'identifier') {
+                        $this->unexpectedToken($token);
+                    }
+                    $optionList['argName'] = $token[1];
+                    $token = $this->readNextToken();
+                } else {
+                    $optionList['argName'] = null;
+                }
                 if ($token === null || $token[0] !== ']') {
                     $this->unexpectedToken($token);
                 }

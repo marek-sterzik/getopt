@@ -9,22 +9,24 @@ array_shift($argv);
 
 $options = [
     'a|append              append commit',
-    'm|message:            commit message',
-    'o|optional?           optional argument',
-    'A|array*              array argument',
-    'yes|no{1}[enabled=@]  enable',
+    'm|message:            [=msg]commit message',
+    'o|optional?           [=opt]optional argument',
+    'A|array*              [=arr]array argument',
+    'yes|no{1}[enabled=@]  enable[yes]yes, it should be enabled[no|@@@]no, it should be disabled \\[hahaha\\]',
     '$command:             command',
     '$args{3}              command-args',
 ];
 
-foreach ($options as $option) {
-    echo $option."\n";
-}
-echo "\n";
 
 $options = new Options($options);
 $options->setStrictMode(true);
 
-$parsed = $options->parseArgs($argv);
-echo "----------------------------------------\n";
-var_dump($parsed);
+echo $options->getHelpFormatted();
+
+try {
+    $parsed = $options->parseArgs($argv);
+    echo "----------------------------------------\n";
+    var_dump($parsed);
+} catch (\Exception $e) {
+    echo "Error: " . $e->getMessage() . "\n";
+}

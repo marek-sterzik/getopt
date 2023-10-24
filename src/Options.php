@@ -27,6 +27,12 @@ class Options
     /** @var array */
     private $argCache = null;
 
+    /** @var string|null */
+    private $argv0 = null;
+
+    /** @var string|null */
+    private $commandDescription = null;
+
     public function __construct(array $options, bool $strictMode = true, bool $standaloneOptionalArgAllowed = false)
     {
         
@@ -78,6 +84,36 @@ class Options
             }
         }
         $this->options[] = $option;
+    }
+
+    public function setCommandDescription(?string $commandDescription): self
+    {
+        $this->commandDescription = $commandDescription;
+        return $this;
+    }
+
+    public function setArgv0(?string $argv0): self
+    {
+        $this->argv0 = $argv0;
+        return $this;
+    }
+
+    public function getHelpFormatted(?FormatterInterface $formatter = null): ?string
+    {
+        $argv0 = $this->argv0 ?? (isset($_SERVER['argv'][0]) ? $_SERVER['argv'][0] : 'command');
+        $args = $this->getArgsHelpFormatted($formatter);
+        $options = $this->getOptionsHelpFormatted($formatter);
+        return Formatter::instance($formatter)->formatHelp($argv0, $this->commandDescription, $args, $options);
+    }
+
+    public function getOptionsHelpFormatted(?FormatterInterface $formatter = null): ?string
+    {
+        return Formatter::instance($formatter)->formatOptionsHelp($this->getOptionsHelp());
+    }
+
+    public function getArgsHelpFormatted(?FormatterInterface $formatter = null): ?string
+    {
+        return Formatter::instance($formatter)->formatArgsHelp($this->getArgsHelp());
     }
 
     public function getOptionsHelp(): array

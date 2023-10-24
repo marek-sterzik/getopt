@@ -47,7 +47,7 @@ class OptionTokenizer
                     yield ["error", $char, $i];
                 }
             } elseif ($state === 'help') {
-                if ($char === '[') {
+                if ($accType !== 'escape' && $char === '[') {
                     if ($accType !== null) {
                         yield [$accType, $acc, $accIndex];
                         $accType = null;
@@ -55,6 +55,8 @@ class OptionTokenizer
                     }
                     yield [$char, $char, $i];
                     $state = 'helpoptions';
+                } elseif ($accType !== 'escape' && $char === ']') {
+                    yield ["error", $char, $i];
                 } elseif (($accType === null || $accType === 'space') && ctype_space($char)) {
                     if ($accType === null) {
                         $accType = "space";
@@ -63,7 +65,7 @@ class OptionTokenizer
                     }
                     $acc .= $char;
                 } else {
-                    if ($accType !== null && $accType !== 'help') {
+                    if ($accType !== null && $accType !== 'help' && $accType !== 'escape') {
                         yield [$accType, $acc, $accIndex];
                         $accType = null;
                         $acc = "";
@@ -72,7 +74,18 @@ class OptionTokenizer
                         $accType = "help";
                         $accIndex = $i;
                     }
-                    $acc .= $char;
+                    if ($accType === 'help' && $char === '\\') {
+                        $accType = "escape";
+                    } elseif ($accType === "escape") {
+                        if ($char !== '[' && $char !== ']' && $char !== '\\') {
+                            $acc .= '\\' . $char;
+                        } else {
+                            $acc .= $char;
+                        }
+                        $accType = "help";
+                    } else {
+                        $acc .= $char;
+                    }
                 }
             } elseif ($accType === "quote") {
                 $acc .= $char;
@@ -121,6 +134,9 @@ class OptionTokenizer
             }
         }
         if ($accType !== null) {
+            if ($accType === 'escape') {
+                $accType = 'help';
+            }
             if ($accType === "quote" || $accType === "quote-escape") {
                 yield ["error", $acc, $accIndex];
             } else {

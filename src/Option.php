@@ -54,7 +54,6 @@ class Option
         $this->max = $decoded['max'] ?? null;
         $this->checker = $decoded['checker'] ?? null;
         $this->rules = $decoded['rules'] ?? [['from' => '$', 'to' => ['@@@'], 'type' => '$']];
-        $this->help = $this->decodeHelp($decoded['help'] ?? ['default' => null, 'byOptions' => []]);
 
         if ($this->isArgument) {
             if (count($this->short) + count($this->long) > 1) {
@@ -103,6 +102,8 @@ class Option
                 }
             } 
         }
+
+        $this->help = $this->decodeHelp($decoded['help'] ?? ['default' => null, 'byOptions' => []]);
     }
 
     public function __clone()
@@ -245,24 +246,47 @@ class Option
 
     private function decodeHelp(array $helpDescriptor): array
     {
-        $help = [["short" => [], "long" => [], "description" => $helpDescriptor['default']]];
+        $help = [[
+            "short" => [],
+            "long" => [],
+            "argName" => null,
+            "description" => $helpDescriptor['default']
+        ]];
         $short = array_fill_keys($this->getShort(false), true);
         $long = array_fill_keys($this->getLong(false), true);
+        $shortWildcardIndex = 0;
+        $longWildcardIndex = 0;
         foreach ($helpDescriptor['byOptions'] as $descriptor) {
+            $isShortWildcard = in_array('@', $descriptor['short']);
+            $isLongWildcard = in_array('@@', $descriptor['long']);
             $helpRecord = [
                 'short' => $this->pickOpts($short, $descriptor['short']),
                 'long' => $this->pickOpts($long, $descriptor['long']),
+                'argName' => $descriptor['argName'],
                 'description' => $descriptor['description'],
             ];
-            if (!empty($helpRecord['short'])  || !empty($helpRecord['long'])) {
-                $help[] = $helpRecord;
+            if ($isShortWildcard && $shortWildcardIndex === 0) {
+                $shortWildcardIndex = count($help);
             }
+            if ($isLongWildcard && $longWildcardIndex === 0) {
+                $longWildcardIndex = count($help);
+            }
+            $help[] = $helpRecord;
         }
-        $help[0]['short'] = $this->pickOpts($short, ['@']);
-        $help[0]['long'] = $this->pickOpts($long, ['@@']);
-        if (empty($help[0]['short']) && empty($help[0]['long'])) {
-            array_shift($help);
-        }
+        $help[$shortWildcardIndex]["short"] = array_merge($help[$shortWildcardIndex]['short'], array_keys($short));
+        $help[$longWildcardIndex]["long"] = array_merge($help[$longWildcardIndex]['long'], array_keys($long));
+        $help = array_filter($help, function($helpRecord) {
+            return count($helpRecord['short']) + count($helpRecord['long']) > 0;
+        });
+        $help = array_map(function ($data) {
+            if ($this->isArgument()) {
+                $data['argName'] = $data['argName'] ?? $data['long'][0] ?? $data['short'][0] ?? null;
+                unset($data['long']);
+                unset($data['short']);
+            }
+            $data['argType'] = $this->argType;
+            return $data;
+        }, $help);
         return $help;
     }
 
@@ -271,7 +295,7 @@ class Option
         $template = array_fill_keys($template, true);
         $pickedOpts = [];
         foreach (array_keys($opts) as $opt) {
-            if (isset($template[$opt]) || isset($template['@']) || isset($template['@@'])) {
+            if (isset($template[$opt])) {
                 $pickedOpts[] = $opt;
                 unset($opts[$opt]);
             }
