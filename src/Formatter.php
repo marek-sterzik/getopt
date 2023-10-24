@@ -22,12 +22,7 @@ abstract class Formatter implements FormatterInterface
         self::$formatter = $formatter ?? (new DefaultFormatter());
     }
 
-    abstract public function formatHelp(
-            string $argv0,
-            ?string $commandDescription,
-            ?string $args,
-            ?string $options
-    ): string;
+    abstract public function formatHelp(string $argv0, ?string $args, ?string $options): string;
     abstract public function formatOptionsHelp(array $options): ?string;
     abstract public function formatArgsHelp(array $args): ?string;
 }

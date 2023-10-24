@@ -30,9 +30,6 @@ class Options
     /** @var string|null */
     private $argv0 = null;
 
-    /** @var string|null */
-    private $commandDescription = null;
-
     public function __construct(array $options, bool $strictMode = true, bool $standaloneOptionalArgAllowed = false)
     {
         
@@ -86,12 +83,6 @@ class Options
         $this->options[] = $option;
     }
 
-    public function setCommandDescription(?string $commandDescription): self
-    {
-        $this->commandDescription = $commandDescription;
-        return $this;
-    }
-
     public function setArgv0(?string $argv0): self
     {
         $this->argv0 = $argv0;
@@ -103,7 +94,7 @@ class Options
         $argv0 = $this->argv0 ?? (isset($_SERVER['argv'][0]) ? $_SERVER['argv'][0] : 'command');
         $args = $this->getArgsHelpFormatted($formatter);
         $options = $this->getOptionsHelpFormatted($formatter);
-        return Formatter::instance($formatter)->formatHelp($argv0, $this->commandDescription, $args, $options);
+        return Formatter::instance($formatter)->formatHelp($argv0, $args, $options);
     }
 
     public function getOptionsHelpFormatted(?FormatterInterface $formatter = null): ?string

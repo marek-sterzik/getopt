@@ -9,15 +9,13 @@ class DefaultFormatter extends Formatter
 
     private $width = 120;
 
-    public function formatHelp(string $argv0, ?string $commandDescription, ?string $args, ?string $options): string
+    public function formatHelp(string $argv0, ?string $args, ?string $options): string
     {
         $usage = $this->formatUsage($argv0, isset($args), isset($options));
-        $description = null;
         return $this->formatBlocks([
             ["Usage:", $usage],
             ["Arguments:", $args],
             ["Options:", $options],
-            ["Description:", $description],
         ]);
     }
 
@@ -119,8 +117,18 @@ class DefaultFormatter extends Formatter
         return $usage;
     }
 
+    public function getWidth(bool $removeIndent = false): int
+    {
+        return $this->width - $removeIndent ? self::INDENT_LEVEL : 0;
+    }
 
-    private function formatBlocks(array $blocks): string
+    public function setWidth(int $width): self
+    {
+        $this->width = $width;
+        return $this;
+    }
+
+    public function formatBlocks(array $blocks): string
     {
         return $this->formatBlocksRaw(array_map(function ($block) {
             return [isset($block[0]) ? ($block[0] . "\n") : null, isset($block[1]) ? $this->indent($block[1]) : null];
@@ -140,17 +148,17 @@ class DefaultFormatter extends Formatter
         return $output;
     }
 
-    private function indent(string $string, int $level = 1): string
+    private function indent(string $string): string
     {
-        $indent = $this->getIndentation($level);
+        $indent = $this->getIndentation();
         return $indent . preg_replace_callback('/\n(.)/', function($matches) use ($indent) {
             return "\n" . $indent . $matches[1];
         }, $string);
     }
 
-    private function getIndentation(int $level = 1): string
+    private function getIndentation(): string
     {
-        return str_repeat(self::INDENT_CHAR, self::INDENT_LEVEL * $level);
+        return str_repeat(self::INDENT_CHAR, self::INDENT_LEVEL);
     }
 
 }
