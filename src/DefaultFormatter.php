@@ -119,7 +119,7 @@ class DefaultFormatter extends Formatter
 
     public function getWidth(bool $removeIndent = false): int
     {
-        return $this->width - $removeIndent ? self::INDENT_LEVEL : 0;
+        return $this->width - ($removeIndent ? self::INDENT_LEVEL : 0);
     }
 
     public function setWidth(int $width): self
