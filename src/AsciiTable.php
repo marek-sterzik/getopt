@@ -22,12 +22,14 @@ class AsciiTable
     /** @var bool */
     private $drawBorder = false;
 
-    public function column($padding = null, int $min = 1, string $wordSplitter = "normal"): self
+    public function column($padding = null, string $align = "left", int $min = 1, string $wordSplitter = "normal"): self
     {
+        $this->calcLeftSpaces(0, $align);
         $column = [
             "min" => $min,
             "wordSplitter" => $wordSplitter,
             "padding" => $this->parsePadding($padding),
+            "align" => $align,
         ];
         $column['pad'] = $column['padding']['left'] + $column['padding']['right'];
         $this->columns[] = $column;
@@ -157,6 +159,9 @@ class AsciiTable
                 }
                 $spaces += $this->columns[$column]['padding']['left'];
                 $line = $cell[$i] ?? '';
+                $lineSpaces = $cellSizes[$column] - mb_strlen($line, $this->encoding);
+                $leftSpaces = $this->calcLeftSpaces($lineSpaces, $this->columns[$column]['align']);
+                $spaces += $leftSpaces;
                 if ($line !== '') {
                     if ($spaces > 0) {
                         $output .= str_repeat(' ', $spaces);
@@ -164,7 +169,7 @@ class AsciiTable
                     }
                 }
                 $output .= $line;
-                $spaces += $cellSizes[$column] - mb_strlen($line, $this->encoding);
+                $spaces += $lineSpaces - $leftSpaces;
                 $spaces += $this->columns[$column]['padding']['right'];
             }
             if ($this->drawBorder) {
@@ -177,6 +182,20 @@ class AsciiTable
             $output .= "\n";
         }
         return $output;
+    }
+
+    private function calcLeftSpaces(int $spaces, string $align)
+    {
+        switch ($align) {
+        case 'left':
+            return 0;
+        case 'right':
+            return $spaces;
+        case 'center':
+            return intdiv($spaces, 2);
+        default:
+            throw new Exception(sprintf("Invalid align: %s", $align));
+        }
     }
 
     private function borderRow(array $cellSizes)

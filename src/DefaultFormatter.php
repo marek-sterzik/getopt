@@ -36,13 +36,13 @@ class DefaultFormatter extends Formatter
             Option::ARG_NONE => "--%s",
             Option::ARG_REQUIRED => "--%s=<%s>",
             Option::ARG_OPTIONAL => "--%s[=<%s>]",
-            Option::ARG_ARRAY => "[--%s=<%s>] ...",
+            Option::ARG_ARRAY => "--%s=<%s> ...",
         ];
         $argTypesShort = [
             Option::ARG_NONE => "-%s",
             Option::ARG_REQUIRED => "-%s <%s>",
             Option::ARG_OPTIONAL => "-%s[<%s>]",
-            Option::ARG_ARRAY => "[-%s <%s>] ...",
+            Option::ARG_ARRAY => "-%s <%s> ...",
         ];
         foreach ($options as $option) {
             $n = max(count($option['short']), count($option['long']));
