@@ -73,6 +73,8 @@ class Option
                 }
             } elseif ($this->max === null || $this->max > 1) {
                 $this->argType = self::ARG_ARRAY;
+            } elseif ($this->isArgument()) {
+                $this->argType = self::ARG_REQUIRED;
             } else {
                 $this->argType = self::ARG_NONE;
             }

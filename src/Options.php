@@ -4,6 +4,11 @@ namespace SPSOstrov\GetOpt;
 
 class Options
 {
+    const ARG_NONE = Option::ARG_NONE;
+    const ARG_REQUIRED = Option::ARG_REQUIRED;
+    const ARG_OPTIONAL = Option::ARG_OPTIONAL;
+    const ARG_ARRAY = Option::ARG_ARRAY;
+
     const DEFAULT_ARG_DEF = '$args*[__args__]';
 
     /** @var array<string,Option> */
