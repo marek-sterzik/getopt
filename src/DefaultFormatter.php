@@ -128,7 +128,7 @@ class DefaultFormatter extends Formatter
         return $this;
     }
 
-    public function formatBlock(string $caption, ?string $description): string
+    public function formatBlock(?string $caption, ?string $description): string
     {
         return $this->formatBlocks([[$caption, $description]]);
     }
