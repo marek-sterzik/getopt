@@ -128,7 +128,12 @@ class DefaultFormatter extends Formatter
         return $this;
     }
 
-    public function formatBlocks(array $blocks): string
+    public function formatBlock(string $caption, ?string $description): string
+    {
+        return $this->formatBlocks([[$caption, $description]]);
+    }
+
+    private function formatBlocks(array $blocks): string
     {
         return $this->formatBlocksRaw(array_map(function ($block) {
             return [isset($block[0]) ? ($block[0] . "\n") : null, isset($block[1]) ? $this->indent($block[1]) : null];
