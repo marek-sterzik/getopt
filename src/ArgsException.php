@@ -25,7 +25,7 @@ class ArgsException extends Exception
         return $this->argsErrorMessage;
     }
 
-    public function getArgsErrorPosition(): int
+    public function getArgsErrorPosition(): ?int
     {
         return $this->argsErrorPosition;
     }

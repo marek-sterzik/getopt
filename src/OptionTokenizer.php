@@ -6,6 +6,9 @@ class OptionTokenizer
 {
     private const STANDALONE_CHARS = "[]|:?*={},$~";
 
+    /**
+     * @return \Generator<array<mixed>>
+     */
     public function tokenize(string $optionDescriptor): iterable
     {
         $n = strlen($optionDescriptor);

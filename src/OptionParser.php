@@ -9,7 +9,6 @@ class OptionParser
     private $data;
     private $index;
     private $tokens;
-    private $optionsLength;
     private $errorPosition;
     private $lastPosition;
 
@@ -42,12 +41,6 @@ class OptionParser
                 $this->index++;
             }
         }
-
-        $token = $this->readToken(false);
-        if ($token !== null) {
-            $this->unexpectedToken($token);
-        }
-
         return $this->data;
     }
 
@@ -57,7 +50,6 @@ class OptionParser
         $this->index = 0;
         $this->tokens = (new OptionTokenizer())->tokenize($options);
         $this->tokens->rewind();
-        $this->optionsLength = strlen($options);
         $this->errorPosition = null;
         $this->lastPosition = "1:1";
     }
@@ -477,7 +469,7 @@ class OptionParser
         } elseif (is_callable($method)) {
             $method();
         } else {
-            throw Exception("Parser bug: invalid callback for loadByTypeSingle()");
+            throw new Exception("Parser bug: invalid callback for loadByTypeSingle()");
         }
         return $token[0];
     }

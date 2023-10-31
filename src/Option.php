@@ -2,18 +2,12 @@
 
 namespace SPSOstrov\GetOpt;
 
-class Option
+final class Option
 {
     public const ARG_NONE = "none";
     public const ARG_REQUIRED = "required";
     public const ARG_OPTIONAL = "optional";
     public const ARG_ARRAY = "array";
-
-    /** @var int */
-    private static $idCounter = 0;
-
-    /** @var int */
-    private $id;
 
     /** @var bool */
     private $isArgument;
@@ -44,7 +38,6 @@ class Option
 
     public function __construct(array $parsedOption)
     {
-        $this->id = ++static::$idCounter;
         $this->isArgument = $parsedOption['isArgument'];
         $this->short = $parsedOption['short'];
         $this->long = $parsedOption['long'];
@@ -107,16 +100,6 @@ class Option
         $this->help = $this->decodeHelp($parsedOption['help'] ?? ['default' => null, 'byOptions' => []]);
     }
 
-    public function __clone()
-    {
-        $this->id = ++static::$idCounter;
-    }
-
-    public function id(): int
-    {
-        return $this->id;
-    }
-
     public function hasArgument(): bool
     {
         return in_array($this->argType, [self::ARG_ARRAY, self::ARG_REQUIRED, self::ARG_OPTIONAL]);
@@ -127,16 +110,25 @@ class Option
         return $this->isArgument;
     }
 
+    /**
+     * @return string[]
+     */
     public function getShort(bool $includeWildcard = true): array
     {
         return $this->processWildcard($this->short, $includeWildcard);
     }
 
+    /**
+     * @return string[]
+     */
     public function getLong(bool $includeWildcard = true): array
     {
         return $this->processWildcard($this->long, $includeWildcard);
     }
 
+    /**
+     * @return string[]
+     */
     private function processWildcard(array $data, bool $includeWildcard): array
     {
         if ($includeWildcard) {
@@ -150,6 +142,9 @@ class Option
         });
     }
 
+    /**
+     * @return string[]
+     */
     public function getAll(bool $includeWildcard = true): array
     {
         return array_merge($this->getShort($includeWildcard), $this->getLong($includeWildcard));

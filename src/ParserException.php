@@ -29,7 +29,7 @@ class ParserException extends Exception
         return $this->parserErrorMessage;
     }
 
-    public function getParserErrorPosition(): string
+    public function getParserErrorPosition(): ?string
     {
         return $this->parserErrorPosition;
     }

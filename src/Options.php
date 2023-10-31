@@ -29,12 +29,15 @@ class Options
     /** @var bool */
     private $standaloneOptionalArgAllowed = false;
 
-    /** @var array */
+    /** @var array<string,int>|null */
     private $argCache = null;
 
     /** @var string|null */
     private $argv0 = null;
 
+    /**
+     * @param string|Option|null|array<string|Option|null> $options
+     */
     public function __construct($options, bool $strictMode = true, bool $standaloneOptionalArgAllowed = false)
     {
         $this->strictMode = $strictMode;
@@ -42,6 +45,9 @@ class Options
         $this->registerOptions($options);
     }
 
+    /**
+     * @param string|Option|null|array<string|Option|null> $options
+     */
     public function registerOptions($options, bool $strict = true): self
     {
         if (is_array($options)) {
@@ -67,7 +73,6 @@ class Options
 
     private function registerOptionReal(Option $option, bool $strict = true): self
     {
-        $cloned = false;
         if ($option->isArgument()) {
             $this->argMap[] = $option;
         } else {
@@ -88,10 +93,6 @@ class Options
                         $message = sprintf("Option %s must be defined only once in Options", $name);
                         throw new ParserException($message);
                     } else {
-                        if (!$cloned) {
-                            $option = clone $option;
-                            $cloned = true;
-                        }
                         $option->removeOption($name);
                     }
                 }
@@ -127,6 +128,9 @@ class Options
         return Formatter::instance($formatter)->formatArgsHelp($this->getArgsHelp());
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function getOptionsHelp(): array
     {
         $help = [];
@@ -138,6 +142,9 @@ class Options
         return $help;
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function getArgsHelp(): array
     {
         $help = [];
@@ -167,7 +174,8 @@ class Options
 
     public function setStandaloneOptionalArgAllowed(bool $standaloneOptionalArgAllowed): self
     {
-        return $this->standaloneOptionalArgAllowed = $standaloneOptionalArgAllowed;
+        $this->standaloneOptionalArgAllowed = $standaloneOptionalArgAllowed;
+        return $this;
     }
 
     public function getArgTypeFor(string $option): ?string
@@ -186,7 +194,7 @@ class Options
         }
         if (empty($this->argMap)) {
             if ($this->defaultArgOption === null) {
-                $this->defaultArgOption = new Option(self::DEFAULT_ARG_DEF);
+                $this->defaultArgOption = new Option((new OptionParser())->parse(self::DEFAULT_ARG_DEF));
             }
             $max = $this->defaultArgOption->getMax();
             if ($max !== null && $max < $argNumber) {

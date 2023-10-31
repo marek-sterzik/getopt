@@ -53,7 +53,7 @@ class ArgsParser
     private function checkLimits(): void
     {
         foreach ($this->options->getAll() as $option) {
-            $count = $this->statistics[$option->id()] ?? 0;
+            $count = $this->statistics[spl_object_hash($option)] ?? 0;
             $optionName = $option->getRepresentatives(true) ?? '<unknown>';
             $type = $option->isArgument() ? 'argument' : 'option';
             $message = null;
@@ -103,7 +103,7 @@ class ArgsParser
                 $this->writeValue($option, $key, $valueToWrite, $arrayWrite);
             }
         }
-        $id = $option->id();
+        $id = spl_object_hash($option);
         $this->statistics[$id] = ($this->statistics[$id] ?? 0) + 1;
     }
 
