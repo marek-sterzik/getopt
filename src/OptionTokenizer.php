@@ -4,7 +4,8 @@ namespace SPSOstrov\GetOpt;
 
 class OptionTokenizer
 {
-    const STANDALONE_CHARS = "[]|:?*={},$~";
+    private const STANDALONE_CHARS = "[]|:?*={},$~";
+
     public function tokenize(string $optionDescriptor): iterable
     {
         $n = strlen($optionDescriptor);

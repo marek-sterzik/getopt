@@ -6,7 +6,7 @@ use Exception;
 
 class AsciiTable
 {
-    const DEFAULT_WIDTH = 120;
+    public const DEFAULT_WIDTH = 120;
 
     /** @var string */
     private $encoding = "utf8";

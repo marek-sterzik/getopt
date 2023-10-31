@@ -70,7 +70,12 @@ class ArgsParser
                 }
             } elseif ($option->getMax() !== null && $option->getMax() < $count) {
                 if ($option->getMax() > 1) {
-                    $message = sprintf("Too many %ss %s (only %d options allowed)", $type, $optionName, $option->getMax());
+                    $message = sprintf(
+                        "Too many %ss %s (only %d options allowed)",
+                        $type,
+                        $optionName,
+                        $option->getMax()
+                    );
                 } elseif ($option->getMax() < 1) {
                     $message = sprintf("Using %s %s is forbidden", $type, $optionName);
                 } else {

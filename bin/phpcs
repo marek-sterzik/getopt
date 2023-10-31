@@ -2,9 +2,17 @@
 
 cd "$(dirname "$(which "$0")")/.."
 
-flags=""
+phpcs() {
+    vendor/bin/phpcs --standard=PSR12 src
+}
+
+suppress_output=0
 if [ "$1" == "--quiet" -o "$1" == "-q" ]; then
-    flags="$flags --no-output"
+    suppress_output=1
 fi
 
-vendor/bin/phpcs --standard=PSR12 src
+if [ "$suppress_output" = 1 ]; then
+    phpcs > /dev/null 2>&1
+else
+    phpcs
+fi

@@ -4,8 +4,8 @@ namespace SPSOstrov\GetOpt;
 
 class ArgsTokenizer
 {
-    const LONGOPT_REGEXP = '[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*';
-    const SHORTOPT_REGEXP = '[a-zA-Z0-9]';
+    public const LONGOPT_REGEXP = '[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*';
+    public const SHORTOPT_REGEXP = '[a-zA-Z0-9]';
 
     /** @var Options */
     private $options;

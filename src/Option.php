@@ -4,10 +4,10 @@ namespace SPSOstrov\GetOpt;
 
 class Option
 {
-    const ARG_NONE = "none";
-    const ARG_REQUIRED = "required";
-    const ARG_OPTIONAL = "optional";
-    const ARG_ARRAY = "array";
+    public const ARG_NONE = "none";
+    public const ARG_REQUIRED = "required";
+    public const ARG_OPTIONAL = "optional";
+    public const ARG_ARRAY = "array";
 
     /** @var int */
     private static $idCounter = 0;

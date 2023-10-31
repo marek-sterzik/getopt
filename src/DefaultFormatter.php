@@ -4,8 +4,8 @@ namespace SPSOstrov\GetOpt;
 
 class DefaultFormatter extends Formatter
 {
-    const INDENT_LEVEL = 2;
-    const INDENT_CHAR = " ";
+    public const INDENT_LEVEL = 2;
+    public const INDENT_CHAR = " ";
 
     private $width = 120;
 
