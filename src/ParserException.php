@@ -9,13 +9,13 @@ class ParserException extends Exception
     /** @var string */
     private $parserErrorMessage;
     
-    /** @var int|null */
+    /** @var string|null */
     private $parserErrorPosition;
 
-    public function __construct(string $parserErrorMessage, ?int $parserErrorPosition = null)
+    public function __construct(string $parserErrorMessage, ?string $parserErrorPosition = null)
     {
         if ($parserErrorPosition !== null) {
-            $message = sprintf("Parser error at char %d: %s", $parserErrorPosition, $parserErrorMessage);
+            $message = sprintf("Parser error at char [%s]: %s", $parserErrorPosition, $parserErrorMessage);
         } else {
             $message = sprintf("Parser error: %s", $parserErrorMessage);
         }
@@ -29,7 +29,7 @@ class ParserException extends Exception
         return $this->parserErrorMessage;
     }
 
-    public function getParserErrorPosition(): int
+    public function getParserErrorPosition(): string
     {
         return $this->parserErrorPosition;
     }

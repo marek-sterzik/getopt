@@ -35,26 +35,39 @@ class Options
     /** @var string|null */
     private $argv0 = null;
 
-    public function __construct(array $options, bool $strictMode = true, bool $standaloneOptionalArgAllowed = false)
+    public function __construct($options, bool $strictMode = true, bool $standaloneOptionalArgAllowed = false)
     {
-        
         $this->strictMode = $strictMode;
         $this->standaloneOptionalArgAllowed = $standaloneOptionalArgAllowed;
-        foreach ($options as $option) {
-            $this->registerOption($option);
-        }
+        $this->registerOptions($options);
     }
 
-    public function registerOption($option, bool $strict = true)
+    public function registerOptions($options, bool $strict = true): self
+    {
+        if(is_array($options)) {
+            foreach ($options as $option) {
+                $this->registerOptions($option, $strict);
+            }
+        } elseif ($options === null) {
+            // do nothing
+        } elseif ($options instanceof Option) {
+            $this->registerOptionReal(clone $options, $strict);
+        } elseif (is_string($options)) {
+            foreach ((new OptionParser())->parse($options) as $option) {
+                if (!empty($option)) {
+                    $this->registerOptionReal(new Option($option), $strict);
+                }
+            }
+        } else {
+            throw new ParserException("Invalid options format");
+        }
+
+        return $this;
+    }
+
+    private function registerOptionReal(Option $option, bool $strict = true): self
     {
         $cloned = false;
-        if (!($option instanceof Option)) {
-            if (!is_string($option)) {
-                throw new ParserException("Options needs to be specified as strings");
-            }
-            $option = new Option($option);
-            $cloned = true;
-        }
         if ($option->isArgument()) {
             $this->argMap[] = $option;
         } else {
@@ -86,6 +99,8 @@ class Options
             }
         }
         $this->options[] = $option;
+
+        return $this;
     }
 
     public function setArgv0(?string $argv0): self

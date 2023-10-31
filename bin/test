@@ -7,15 +7,24 @@ require_once dirname(__DIR__) . "/vendor/autoload.php";
 
 array_shift($argv);
 
-$options = [
-    'a|append              append commit',
-    'm|message:            [=msg]commit message',
-    'o|optional?           [=opt]optional argument',
-    'A|array*              [=arr]array argument',
-    'yes|no{1}[enabled=@]  enable[yes]yes, it should be enabled[no|@@@]no, it should be disabled \\[hahaha\\]',
-    '$command:             command',
-    '$args{3}              command-args',
+/* $options = [
+    'h|help     print help',
+    'v|version     print version',
+    'f|flag:     set flag',
+    '$command? command',
 ];
+ */
+$options = <<<'END'
+
+h|help|hlp      [h]print help
+    [hlp]print long help
+
+    [help]print long help 2
+v|version 
+    print version
+f|flag:     set flag
+$command? command
+END;
 
 
 $options = new Options($options);

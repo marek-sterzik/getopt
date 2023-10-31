@@ -7,25 +7,41 @@ use Exception;
 class OptionParser
 {
     private $data;
+    private $index;
     private $tokens;
     private $optionsLength;
     private $errorPosition;
+    private $lastPosition;
 
     public function parse(string $options): array
     {
         $this->initialize($options);
-        $this->loadIsArgument();
-        $this->merge($this->loadOptionList());
-        $this->loadByTypeMultiple([
-            '{' => 'loadQuantity',
-            ':' => 'loadArgType',
-            '?' => 'loadArgType',
-            '*' => 'loadArgType',
-            '~' => 'loadArgType',
-            'space' => 'loadDescription',
-            '=' => 'loadChecker',
-            '[' => 'loadWriteRules',
-        ], true);
+        while ($this->readToken(false) !== null) {
+            $this->skipAllEmpty();
+            if ($this->readToken(false) !== null) {
+                $this->data[$this->index] = [];
+                $this->loadIsArgument();
+                $this->merge($this->loadOptionList());
+                $this->loadByTypeMultiple([
+                    '{' => 'loadQuantity',
+                    ':' => 'loadArgType',
+                    '?' => 'loadArgType',
+                    '*' => 'loadArgType',
+                    '~' => 'loadArgType',
+                    '=' => 'loadChecker',
+                    '[' => 'loadWriteRules',
+                ], true);
+                $token = $this->readToken(false);
+                if ($token !== null) {
+                    if ($token[0] === 'space') {
+                        $this->loadDescription();
+                    } elseif ($token[0] === 'nl') {
+                        $this->readToken();
+                    }
+                }
+                $this->index++;
+            }
+        }
 
         $token = $this->readToken(false);
         if ($token !== null) {
@@ -33,21 +49,53 @@ class OptionParser
         }
 
         return $this->data;
-
     }
 
     private function initialize(string $options)
     {
         $this->data = [];
+        $this->index = 0;
         $this->tokens = (new OptionTokenizer())->tokenize($options);
         $this->tokens->rewind();
         $this->optionsLength = strlen($options);
         $this->errorPosition = null;
+        $this->lastPosition = "1:1";
     }
+
 
     private function merge(array $data): void
     {
-        $this->data = array_merge($this->data, $data);
+        $this->data[$this->index] = array_merge($this->data[$this->index], $data);
+    }
+
+    private function keyExists(string $key): bool
+    {
+        return array_key_exists($key, $this->data[$this->index]);
+    }
+
+    private function skipAllEmpty(): void
+    {
+        while($this->skipEmpty()) {
+        }
+    }
+
+    private function skipEmpty(): bool
+    {
+        $token = $this->readToken(false);
+        $space = false;
+        if ($token !== null && $token[0] === 'space') {
+            $token = $this->readNextToken();
+            $space = true;
+        }
+        if ($token !== null && $token[0] !== 'nl') {
+            if ($space) {
+                $this->unexpectedToken($token);
+            } else {
+                return false;
+            }
+        }
+        $this->readToken();
+        return true;
     }
 
     private function loadIsArgument(): void
@@ -163,63 +211,79 @@ class OptionParser
         return preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*$/', $identifier);
     }
 
+    private function readHelp(): ?string
+    {
+        $token = $this->readToken(false);
+        if ($token === null || !in_array($token[0], ['help', 'nl', 'space'])) {
+            return null;
+        }
+        $helpText = "";
+        $nl = "";
+        $space = "";
+        while ($token !== null && in_array($token[0], ["space", "nl", "help"])) {
+            if ($token[0] === 'space') {
+                $space = " ";
+            } elseif ($token[0] === 'nl') {
+                $nl .= $token[1];
+            } else {
+                $delim = ($nl !== "") ? $nl : $space; 
+                if ($helpText === '') {
+                    $delim = '';
+                }
+                $nl = "";
+                $space = "";
+                $helpText .= $delim . rtrim($token[1]);
+            }
+            $token = $this->readNextToken();
+        }
+        return $helpText;
+    }
+
     private function loadDescription(): void
     {
         $descriptionDescriptor = ["default" => null, "byOptions" => []];
 
+        $help = $this->readHelp();
+        if ($help !== null) {
+            $descriptionDescriptor['default'] = $help;
+            $token = $this->readToken(false);
+        }
+
         $token = $this->readToken(false);
-        while ($token !== null && $token[0] === 'space') {
-            $token = $this->readNextToken();
-        }
         
-        if ($token !== null) {
-            if ($token[0] === 'help') {
-                $descriptionDescriptor['default'] = rtrim($token[1]);
-                $token = $this->readNextToken();
+        while ($token !== null && $token[0] === '[') {
+            $token = $this->readNextToken();
+            if ($token === null || $token[0] !== '=') {
+                $optionList = $this->loadOptionList();
+                $token = $this->readToken(false);
+            } else {
+                $optionList = ['short' => ['@'], 'long' => ['@@']];
             }
-            while ($token !== null) {
-                if ($token[0] !== '[') {
+            if ($token !== null && $token[0] === '=') {
+                $token = $this->readNextToken();
+                if ($token === null || $token[0] !== 'identifier') {
                     $this->unexpectedToken($token);
                 }
+                $optionList['argName'] = $token[1];
                 $token = $this->readNextToken();
-                if ($token === null || $token[0] !== '=') {
-                    $optionList = $this->loadOptionList();
-                    $token = $this->readToken(false);
-                } else {
-                    $optionList = ['short' => ['@'], 'long' => ['@@']];
-                }
-                if ($token !== null && $token[0] === '=') {
-                    $token = $this->readNextToken();
-                    if ($token === null || $token[0] !== 'identifier') {
-                        $this->unexpectedToken($token);
-                    }
-                    $optionList['argName'] = $token[1];
-                    $token = $this->readNextToken();
-                } else {
-                    $optionList['argName'] = null;
-                }
-                if ($token === null || $token[0] !== ']') {
-                    $this->unexpectedToken($token);
-                }
-                $token = $this->readNextToken();
-                if ($token !== null && $token[0] === 'space') {
-                    $token = $this->readNextToken();
-                }
-                if ($token !== null || $token[0] === 'help') {
-                    $optionList['description'] = rtrim($token[1]);
-                    $token = $this->readNextToken();
-                } else {
-                    $optionList['description'] = null;
-                }
-                $descriptionDescriptor['byOptions'][] = $optionList;
+            } else {
+                $optionList['argName'] = null;
             }
+            if ($token === null || $token[0] !== ']') {
+                $this->unexpectedToken($token);
+            }
+            $this->readToken();
+            $optionList['description'] = $this->readHelp();
+            $token = $this->readToken(false);
+            $descriptionDescriptor['byOptions'][] = $optionList;
         }
+            
         $this->merge(["help" => $descriptionDescriptor]);
     }
 
     private function putQuantity(int $min, ?int $max): void
     {
-        if (array_key_exists('min', $this->data) || array_key_exists('max', $this->data)) {
+        if ($this->keyExists('min') || $this->keyExists('max')) {
             $this->error("Quantity can be specified only once");
         }
         if ($max !== null && $max < $min) {
@@ -243,7 +307,7 @@ class OptionParser
         }
         $this->readToken();
         $argType = $argTypes[$token[0]];
-        if (array_key_exists('argType', $this->data) || array_key_exists('argType', $this->data)) {
+        if ($this->keyExists('argType')) {
             $this->error("Option argument type can be specified only once");
         }
         $this->merge(["argType" => $argType]);
@@ -318,8 +382,11 @@ class OptionParser
         if ($moveToNext) {
             $this->tokens->next();
         }
-        if ($val && $val[0] === 'error') {
-            $this->unexpectedToken($val);
+        if ($val) {
+            $this->lastPosition = $val[2];
+            if ($val[0] === 'error') {
+                $this->unexpectedToken($val);
+            }
         }
         return $val ? $val: null;
     }
@@ -448,7 +515,7 @@ class OptionParser
     {
         $token = $this->readToken(false);
         if ($token === null) {
-            $this->errorPosition = $this->optionsLength;
+            $this->errorPosition = $this->lastPosition;
         } else {
             $this->errorPosition = $token[2];
         }
@@ -459,7 +526,7 @@ class OptionParser
         if ($token !== null) {
             throw new ParserException($message, $token[2]);
         } else {
-            throw new ParserException($message, $nullTokenIsEof ? $this->optionsLength : $this->errorPosition);
+            throw new ParserException($message, $nullTokenIsEof ? $this->lastPosition : $this->errorPosition);
         }
     }
 

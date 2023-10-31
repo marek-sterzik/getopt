@@ -42,18 +42,17 @@ class Option
     /** @var array */
     private $help;
 
-    public function __construct(string $optionDescription)
+    public function __construct(array $parsedOption)
     {
         $this->id = ++static::$idCounter;
-        $decoded = (new OptionParser())->parse($optionDescription);
-        $this->isArgument = $decoded['isArgument'];
-        $this->short = $decoded['short'];
-        $this->long = $decoded['long'];
-        $this->argType = $decoded['argType'] ?? null;
-        $this->min = $decoded['min'] ?? null;
-        $this->max = $decoded['max'] ?? null;
-        $this->checker = $decoded['checker'] ?? null;
-        $this->rules = $decoded['rules'] ?? [['from' => '$', 'to' => ['@@@'], 'type' => '$']];
+        $this->isArgument = $parsedOption['isArgument'];
+        $this->short = $parsedOption['short'];
+        $this->long = $parsedOption['long'];
+        $this->argType = $parsedOption['argType'] ?? null;
+        $this->min = $parsedOption['min'] ?? null;
+        $this->max = $parsedOption['max'] ?? null;
+        $this->checker = $parsedOption['checker'] ?? null;
+        $this->rules = $parsedOption['rules'] ?? [['from' => '$', 'to' => ['@@@'], 'type' => '$']];
 
         if ($this->isArgument) {
             if (count($this->short) + count($this->long) > 1) {
@@ -105,14 +104,13 @@ class Option
             } 
         }
 
-        $this->help = $this->decodeHelp($decoded['help'] ?? ['default' => null, 'byOptions' => []]);
+        $this->help = $this->decodeHelp($parsedOption['help'] ?? ['default' => null, 'byOptions' => []]);
     }
 
     public function __clone()
     {
         $this->id = ++static::$idCounter;
     }
-
 
     public function id(): int
     {
