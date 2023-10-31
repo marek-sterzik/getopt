@@ -215,6 +215,22 @@ which will render:
     --by-name=<name>  Select entity by name.
 ```
 
+### Multiple options per one string
+
+It is also possible to specify multiple options per one string. In such a case newlines are used to separate options.
+Help text may be also split into multiple lines provided by the help starts with a space on each line:
+
+```
+$options = <<<'EOPT'
+h|help  Print help
+l|long-option
+    This option has a long help
+    so the help text may be splitted into
+    multiple lines.
+
+EOPT;
+```
+
 ## Tuning the Options object.
 
 Onece an instance of the `SPSOstrov\GetOpt\Options` class is created, you may fine-tune some settings:
