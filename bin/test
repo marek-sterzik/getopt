@@ -1,41 +1,10 @@
-#!/usr/bin/env php
-<?php
+#!/bin/bash
 
-namespace SPSOstrov\GetOpt;
+cd "$(dirname "$(which "$0")")/.."
 
-require_once dirname(__DIR__) . "/vendor/autoload.php";
+flags=""
+if [ "$1" == "--quiet" -o "$1" == "-q" ]; then
+    flags="$flags --no-output"
+fi
 
-array_shift($argv);
-
-/* $options = [
-    'h|help     print help',
-    'v|version     print version',
-    'f|flag:     set flag',
-    '$command? command',
-];
- */
-$options = <<<'END'
-
-h|help|hlp      [h]print help
-    [hlp]print long help
-
-    [help]print long help 2
-v|version 
-    print version
-f|flag:     set flag
-$command? command
-END;
-
-
-$options = new Options($options);
-$options->setStrictMode(true);
-
-echo $options->getHelpFormatted();
-
-try {
-    $parsed = $options->parseArgs($argv);
-    echo "----------------------------------------\n";
-    var_dump($parsed);
-} catch (\Exception $e) {
-    echo "Error: " . $e->getMessage() . "\n";
-}
+vendor/bin/phpunit $flags

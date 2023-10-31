@@ -333,7 +333,7 @@ class OptionParser
             $min = 0;
         }
 
-        if ($token[0] !== '}') {
+        if ($token === null || $token[0] !== '}') {
             if ($token === null || ($token[0] !== '}' && $token[0] !== ',')) {
                 $this->unexpectedToken($token);
             }

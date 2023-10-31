@@ -36,7 +36,7 @@ class OptionTokenizer
                 } elseif ($char === "@") {
                     $accType = '@';
                     $acc = $char;
-                    $accIndex = $positin;
+                    $accIndex = $position;
                 } elseif ($char === "\n" || $char === "\r") {
                     $accType = 'nl';
                     $acc = $char;
