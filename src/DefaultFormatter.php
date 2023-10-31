@@ -156,7 +156,7 @@ class DefaultFormatter extends Formatter
     private function indent(string $string): string
     {
         $indent = $this->getIndentation();
-        return $indent . preg_replace_callback('/\n(.)/', function($matches) use ($indent) {
+        return $indent . preg_replace_callback('/\n(.)/', function ($matches) use ($indent) {
             return "\n" . $indent . $matches[1];
         }, $string);
     }
@@ -165,5 +165,4 @@ class DefaultFormatter extends Formatter
     {
         return str_repeat(self::INDENT_CHAR, self::INDENT_LEVEL);
     }
-
 }

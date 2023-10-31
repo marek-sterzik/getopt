@@ -8,7 +8,7 @@ class ArgsException extends Exception
 {
     /** @var string */
     private $argsErrorMessage;
-    
+
     /** @var int|null */
     private $argsErrorPosition;
 
@@ -30,4 +30,3 @@ class ArgsException extends Exception
         return $this->argsErrorPosition;
     }
 }
-

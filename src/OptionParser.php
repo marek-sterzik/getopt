@@ -75,7 +75,7 @@ class OptionParser
 
     private function skipAllEmpty(): void
     {
-        while($this->skipEmpty()) {
+        while ($this->skipEmpty()) {
         }
     }
 
@@ -226,7 +226,7 @@ class OptionParser
             } elseif ($token[0] === 'nl') {
                 $nl .= $token[1];
             } else {
-                $delim = ($nl !== "") ? $nl : $space; 
+                $delim = ($nl !== "") ? $nl : $space;
                 if ($helpText === '') {
                     $delim = '';
                 }
@@ -250,7 +250,7 @@ class OptionParser
         }
 
         $token = $this->readToken(false);
-        
+
         while ($token !== null && $token[0] === '[') {
             $token = $this->readNextToken();
             if ($token === null || $token[0] !== '=') {
@@ -277,7 +277,7 @@ class OptionParser
             $token = $this->readToken(false);
             $descriptionDescriptor['byOptions'][] = $optionList;
         }
-            
+
         $this->merge(["help" => $descriptionDescriptor]);
     }
 
@@ -388,7 +388,7 @@ class OptionParser
                 $this->unexpectedToken($val);
             }
         }
-        return $val ? $val: null;
+        return $val ? $val : null;
     }
 
     private function readNextToken(): ?array
@@ -427,7 +427,6 @@ class OptionParser
                 $this->error(sprintf("Invalid option name: %s", $options['identifier'][0]));
             }
             unset($options['identifier']);
-            
         }
 
         foreach ($options['special'] as $opt) {

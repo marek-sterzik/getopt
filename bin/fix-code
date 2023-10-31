@@ -2,4 +2,4 @@
 
 cd "$(dirname "$(which "$0")")/.."
 
-vendor/bin/phpcbf --standard=standards/phpcs.xml src
+vendor/bin/phpcbf --standard=PSR12 src

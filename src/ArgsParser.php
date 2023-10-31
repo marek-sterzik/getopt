@@ -6,7 +6,7 @@ class ArgsParser
 {
     /** @var ArgsTokenizer */
     private $tokenizer;
-    
+
     /** @var Options */
     private $options;
 
@@ -166,7 +166,7 @@ class ArgsParser
             return;
         }
 
-        $keys = array_filter($keys, function($item) {
+        $keys = array_filter($keys, function ($item) {
             if (!preg_match('/^@{1,3}$/', $item)) {
                 return true;
             }

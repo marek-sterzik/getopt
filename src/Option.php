@@ -101,7 +101,7 @@ class Option
                 } else {
                     $this->max = 1;
                 }
-            } 
+            }
         }
 
         $this->help = $this->decodeHelp($parsedOption['help'] ?? ['default' => null, 'byOptions' => []]);
@@ -172,7 +172,7 @@ class Option
 
     public function removeOption(string $option): void
     {
-        $remover = function($item) use ($option) {
+        $remover = function ($item) use ($option) {
             return $item !== $option;
         };
         $this->short = array_filter($this->short, $remover);
@@ -275,7 +275,7 @@ class Option
         }
         $help[$shortWildcardIndex]["short"] = array_merge($help[$shortWildcardIndex]['short'], array_keys($short));
         $help[$longWildcardIndex]["long"] = array_merge($help[$longWildcardIndex]['long'], array_keys($long));
-        $help = array_filter($help, function($helpRecord) {
+        $help = array_filter($help, function ($helpRecord) {
             return count($helpRecord['short']) + count($helpRecord['long']) > 0;
         });
         $help = array_map(function ($data) {

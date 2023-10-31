@@ -44,7 +44,7 @@ class Options
 
     public function registerOptions($options, bool $strict = true): self
     {
-        if(is_array($options)) {
+        if (is_array($options)) {
             foreach ($options as $option) {
                 $this->registerOptions($option, $strict);
             }
@@ -229,7 +229,6 @@ class Options
             }
             $this->argCache['oi']++;
             $this->argCache['n'] += $max;
-            
         }
         return null;
     }
@@ -242,7 +241,7 @@ class Options
         if (isset($this->map[$option])) {
             return $this->map[$option];
         }
-        $option = (strlen($option) == 1)? '@' : '@@';
+        $option = (strlen($option) == 1) ? '@' : '@@';
         return $this->map[$option] ?? null;
     }
 

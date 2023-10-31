@@ -1,6 +1,7 @@
 <?php
 
 namespace SPSOstrov\GetOpt;
+
 use Exception;
 
 class AsciiTable
@@ -55,13 +56,13 @@ class AsciiTable
         if (is_array($padding)) {
             if ($padding === array_values($padding)) {
                 switch (count($padding)) {
-                case 1:
-                    return [
+                    case 1:
+                        return [
                         'left' => $padding[0],
                         'right' => $padding[0],
                     ];
-                case 2:
-                    return [
+                    case 2:
+                        return [
                         'left' => $padding[0],
                         'right' => $padding[1],
                     ];
@@ -142,7 +143,7 @@ class AsciiTable
         foreach ($row as $cell) {
             $height = max($height, count($cell));
         }
-        for($i = 0; $i < $height; $i++) {
+        for ($i = 0; $i < $height; $i++) {
             if ($this->drawBorder) {
                 $output .= "|";
             }
@@ -187,14 +188,14 @@ class AsciiTable
     private function calcLeftSpaces(int $spaces, string $align)
     {
         switch ($align) {
-        case 'left':
-            return 0;
-        case 'right':
-            return $spaces;
-        case 'center':
-            return intdiv($spaces, 2);
-        default:
-            throw new Exception(sprintf("Invalid align: %s", $align));
+            case 'left':
+                return 0;
+            case 'right':
+                return $spaces;
+            case 'center':
+                return intdiv($spaces, 2);
+            default:
+                throw new Exception(sprintf("Invalid align: %s", $align));
         }
     }
 
@@ -300,7 +301,7 @@ class AsciiTable
     {
         $width = $this->width;
         if ($this->drawBorder) {
-            $width -= count ($this->columns) + 2;
+            $width -= count($this->columns) + 2;
         }
         $data = [
             "cells" => [],
@@ -328,7 +329,7 @@ class AsciiTable
             $data['reserve'] += $cell['reserve'];
         }
         $this->shrinkByReserve($data);
-        if ($data['totalSize'] > $data['width']) { 
+        if ($data['totalSize'] > $data['width']) {
             $data['cells'] = array_merge($data['cells'], $data['passiveCells']);
             $data['passiveCells'] = [];
             $data['reserve'] = 0;
@@ -348,7 +349,6 @@ class AsciiTable
         ksort($cellSizes);
 
         return $cellSizes;
-        
     }
 
     private function shrinkByReserve(array &$data): void

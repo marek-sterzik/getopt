@@ -49,7 +49,7 @@ class ArgsTokenizer
                 $argType = null;
                 for ($i = 0; $i < strlen($currentArg); $i++) {
                     $option = substr($currentArg, $i, 1);
-                    if (!preg_match('/^' . self::SHORTOPT_REGEXP .'$/', $option)) {
+                    if (!preg_match('/^' . self::SHORTOPT_REGEXP . '$/', $option)) {
                         $error = true;
                         break;
                     }
@@ -84,7 +84,7 @@ class ArgsTokenizer
                         yield ["option", $opt, null, $index];
                     }
                     if ($option !== null) {
-                        $rest = substr($currentArg, $i+1);
+                        $rest = substr($currentArg, $i + 1);
                         if ($rest !== '') {
                             yield ["option", $option, $rest, $index];
                             $index++;
@@ -108,10 +108,10 @@ class ArgsTokenizer
                 }
             } elseif ($state === 'long') {
                 $error = false;
-                if (preg_match('/^'. self::LONGOPT_REGEXP . '$/', $currentArg)) {
+                if (preg_match('/^' . self::LONGOPT_REGEXP . '$/', $currentArg)) {
                     $option = $currentArg;
                     $argument = null;
-                } elseif (preg_match('/^('. self::LONGOPT_REGEXP . ')=(.*)$/', $currentArg, $matches)) {
+                } elseif (preg_match('/^(' . self::LONGOPT_REGEXP . ')=(.*)$/', $currentArg, $matches)) {
                     $option = $matches[1];
                     $argument = array_pop($matches);
                 } else {
@@ -170,6 +170,5 @@ class ArgsTokenizer
             yield ["arg", $args[$index], null, $index];
             $index++;
         }
-        
     }
 }

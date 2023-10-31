@@ -8,7 +8,7 @@ class ParserException extends Exception
 {
     /** @var string */
     private $parserErrorMessage;
-    
+
     /** @var string|null */
     private $parserErrorPosition;
 

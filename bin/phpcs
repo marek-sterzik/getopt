@@ -7,4 +7,4 @@ if [ "$1" == "--quiet" -o "$1" == "-q" ]; then
     flags="$flags --no-output"
 fi
 
-vendor/bin/phpcs --standard=standards/phpcs.xml src
+vendor/bin/phpcs --standard=PSR12 src
