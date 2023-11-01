@@ -10,10 +10,10 @@ class ArgsParser
     /** @var Options */
     private $options;
 
-    /** @var array */
+    /** @var array<mixed> */
     private $data = [];
 
-    /** @var array */
+    /** @var array<string,int> */
     private $statistics = [];
 
     public function __construct(Options $options)
@@ -22,6 +22,10 @@ class ArgsParser
         $this->tokenizer = new ArgsTokenizer($options);
     }
 
+    /**
+     * @param array<string> $args
+     * @return array<mixed>
+     */
     public function parse(array $args): array
     {
         $this->data = [];
@@ -107,6 +111,11 @@ class ArgsParser
         $this->statistics[$id] = ($this->statistics[$id] ?? 0) + 1;
     }
 
+    /**
+     * @param array<mixed> $rule
+     * @param mixed $value
+     * @return mixed
+     */
     private function createValue(Option $option, ?string $optionNameUsed, array $rule, $value)
     {
         $type = $rule['type'];
@@ -141,6 +150,9 @@ class ArgsParser
         }
     }
 
+    /**
+     * @param mixed $value
+     */
     private function writeValue(Option $option, string $key, $value, bool $arrayWrite): void
     {
         if ($key === "@") {
@@ -183,6 +195,9 @@ class ArgsParser
         }
     }
 
+    /**
+     * @param mixed &$value
+     */
     private function checkValue(&$value, ?string $checker): void
     {
     }

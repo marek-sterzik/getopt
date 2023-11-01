@@ -11,7 +11,7 @@ class AsciiTable
     /** @var string */
     private $encoding = "utf8";
 
-    /** @var array */
+    /** @var array<array<mixed>> */
     private $columns = [];
 
     /** @var int|null */
@@ -23,6 +23,9 @@ class AsciiTable
     /** @var bool */
     private $drawBorder = false;
 
+    /**
+     * @param mixed $padding
+     */
     public function column($padding = null, string $align = "left", int $min = 1, string $wordSplitter = "normal"): self
     {
         $this->calcLeftSpaces(0, $align);
@@ -39,6 +42,10 @@ class AsciiTable
         return $this;
     }
 
+    /**
+     * @param mixed $padding
+     * @return array<mixed>
+     */
     private function parsePadding($padding): array
     {
         if ($padding === null) {
@@ -111,6 +118,9 @@ class AsciiTable
         }
     }
 
+    /**
+     * @param array<array<string>> $data
+     */
     public function render(array $data): string
     {
         if ($this->width === null) {
@@ -136,6 +146,10 @@ class AsciiTable
         return $result;
     }
 
+    /**
+     * @param array<array<string>> $row
+     * @param array<int> $cellSizes
+     */
     private function row(array $row, array $cellSizes): string
     {
         $output = "";
@@ -185,7 +199,7 @@ class AsciiTable
         return $output;
     }
 
-    private function calcLeftSpaces(int $spaces, string $align)
+    private function calcLeftSpaces(int $spaces, string $align): int
     {
         switch ($align) {
             case 'left':
@@ -199,7 +213,10 @@ class AsciiTable
         }
     }
 
-    private function borderRow(array $cellSizes)
+    /**
+     * @param array<int> $cellSizes
+     */
+    private function borderRow(array $cellSizes): string
     {
         $row = "+";
         foreach ($cellSizes as $index => $size) {
@@ -208,6 +225,11 @@ class AsciiTable
         return $row . "\n";
     }
 
+    /**
+     * @param array<array<array<array<string>>|null>> $data
+     * @param array<int> $cellSizes
+     * @return array<array<array<string>>>
+     */
     private function createLines(array $data, array $cellSizes): array
     {
         $finalRows = [];
@@ -221,6 +243,10 @@ class AsciiTable
         return $finalRows;
     }
 
+    /**
+     * @param array<array<string>> $paragraphs
+     * @return array<string>
+     */
     private function createLinesForCell(array $paragraphs, int $cellSize): array
     {
         $lines = [];
@@ -253,6 +279,10 @@ class AsciiTable
         return $lines;
     }
 
+    /**
+     * @param array<array<string>> $data
+     * @return array<array<array<array<string>>>>
+     */
     private function splitData(array $data): array
     {
         $finalRows = [];
@@ -270,6 +300,10 @@ class AsciiTable
         return $finalRows;
     }
 
+    /**
+     * @param array<array<array<array<string>>>> $data
+     * @return array<array<mixed>>
+     */
     private function calcCellStats(array $data): array
     {
         $stats = [];
@@ -297,7 +331,11 @@ class AsciiTable
         return $stats;
     }
 
-    private function calcCellSizes(array $cellStats)
+    /**
+     * @param array<mixed> $cellStats
+     * @return array<int>
+     */
+    private function calcCellSizes(array $cellStats): array
     {
         $width = $this->width;
         if ($this->drawBorder) {
@@ -351,6 +389,9 @@ class AsciiTable
         return $cellSizes;
     }
 
+    /**
+     * @param array<mixed> $data
+     */
     private function shrinkByReserve(array &$data): void
     {
         while ($data['totalSize'] > $data['width'] && $data['reserve'] > 0) {
@@ -395,6 +436,9 @@ class AsciiTable
         }
     }
 
+    /**
+     * @param array<mixed> $data
+     */
     private function sortBySize(array &$data): void
     {
         usort($data['cells'], function ($a, $b) {
