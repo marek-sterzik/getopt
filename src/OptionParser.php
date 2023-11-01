@@ -6,12 +6,24 @@ use Exception;
 
 class OptionParser
 {
+    /** @var array<array<mixed>>*/
     private $data;
+    
+    /** @var int */
     private $index;
+    
+    /** @var \Generator */
     private $tokens;
+    
+    /** @var string|null */
     private $errorPosition;
+    
+    /** @var string|null */
     private $lastPosition;
 
+    /**
+     * @return array<array<mixed>>
+     */
     public function parse(string $options): array
     {
         $this->initialize($options);
@@ -44,7 +56,7 @@ class OptionParser
         return $this->data;
     }
 
-    private function initialize(string $options)
+    private function initialize(string $options): void
     {
         $this->data = [];
         $this->index = 0;
@@ -54,7 +66,9 @@ class OptionParser
         $this->lastPosition = "1:1";
     }
 
-
+    /**
+     * @param array<mixed> $data
+     */
     private function merge(array $data): void
     {
         $this->data[$this->index] = array_merge($this->data[$this->index], $data);
@@ -101,6 +115,9 @@ class OptionParser
         $this->merge(['isArgument' => $isArgument]);
     }
 
+    /**
+     * @return array<mixed>
+     */
     private function loadWriteRule(): array
     {
         $optionList = $this->loadOptionList(true);
@@ -141,6 +158,9 @@ class OptionParser
         return ['from' => $from, 'to' => $identifiers, 'type' => $type];
     }
 
+    /**
+     * @param array<mixed> $token
+     */
     private function unquote(?array $token): ?string
     {
         if ($token === null || $token[0] !== 'quote') {
@@ -284,7 +304,7 @@ class OptionParser
         $this->merge(["min" => $min, "max" => $max]);
     }
 
-    private function loadArgType()
+    private function loadArgType(): void
     {
         $argTypes = [
             "~" => Option::ARG_NONE,
@@ -354,6 +374,9 @@ class OptionParser
         $this->putQuantity($min, $max);
     }
 
+    /**
+     * @param array<mixed> $token
+     */
     private function tokenToNum(?array $token): ?int
     {
         if ($token === null) {
@@ -368,6 +391,9 @@ class OptionParser
         return (int)$token[1];
     }
 
+    /**
+     * @return array<mixed>|null
+     */
     private function readToken(bool $moveToNext = true): ?array
     {
         $val = $this->tokens->current();
@@ -383,12 +409,18 @@ class OptionParser
         return $val ? $val : null;
     }
 
+    /**
+     * @return array<mixed>|null
+     */
     private function readNextToken(): ?array
     {
         $this->readToken();
         return $this->readToken(false);
     }
 
+    /**
+     * @return array<mixed>
+     */
     private function loadOptionList(bool $allowIdentifiers = false): array
     {
         $this->setErrorPosition();
@@ -442,6 +474,9 @@ class OptionParser
         return $options;
     }
 
+    /**
+     * @param array<string,string> $types
+     */
     private function loadByTypeMultiple(array $types, bool $eachOnlyOnce): void
     {
         $load = true;
@@ -457,6 +492,9 @@ class OptionParser
         }
     }
 
+    /**
+     * @param array<string,string> $types
+     */
     private function loadByTypeSingle(array $types): ?string
     {
         $token = $this->readToken(false);
@@ -474,6 +512,9 @@ class OptionParser
         return $token[0];
     }
 
+    /**
+     * @param array<mixed> $token
+     */
     private function determineOptionType(array $token): ?string
     {
         if ($token[0] === 'identifier') {
@@ -512,7 +553,10 @@ class OptionParser
         }
     }
 
-    private function error(string $message, ?array $token = null, bool $nullTokenIsEof = false)
+    /**
+     * @param array<mixed>|null $token
+     */
+    private function error(string $message, ?array $token = null, bool $nullTokenIsEof = false): void
     {
         if ($token !== null) {
             throw new ParserException($message, $token[2]);
@@ -521,7 +565,10 @@ class OptionParser
         }
     }
 
-    private function unexpectedToken(?array $token)
+    /**
+     * @param array<mixed>|null $token
+     */
+    private function unexpectedToken(?array $token): void
     {
         if ($token !== null) {
             $message = sprintf("Unexpected token: %s", json_encode($token[1]));

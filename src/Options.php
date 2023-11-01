@@ -253,6 +253,10 @@ class Options
         return $this->map[$option] ?? null;
     }
 
+    /**
+     * @param array<string>|null $args
+     * @return array<mixed,mixed>
+     */
     public function parseArgs(?array $args = null): array
     {
         if ($args === null) {
@@ -263,6 +267,9 @@ class Options
         return $parser->parse($args);
     }
 
+    /**
+     * @return array<Option>
+     */
     public function getAll(): array
     {
         $options = $this->options;
