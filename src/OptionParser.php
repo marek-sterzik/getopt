@@ -8,16 +8,16 @@ class OptionParser
 {
     /** @var array<array<mixed>>*/
     private $data;
-    
+
     /** @var int */
     private $index;
-    
+
     /** @var \Generator */
     private $tokens;
-    
+
     /** @var string|null */
     private $errorPosition;
-    
+
     /** @var string|null */
     private $lastPosition;
 
