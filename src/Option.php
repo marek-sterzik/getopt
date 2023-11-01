@@ -30,12 +30,15 @@ final class Option
     /** @var string|null */
     private $checker;
 
-    /** @var array */
+    /** @var array<array<mixed>> */
     private $rules;
 
-    /** @var array */
+    /** @var array<mixed> */
     private $help;
 
+    /**
+     * @param array<mixed> $parsedOption
+     */
     public function __construct(array $parsedOption)
     {
         $this->isArgument = $parsedOption['isArgument'];
@@ -127,6 +130,7 @@ final class Option
     }
 
     /**
+     * @param string[] $data
      * @return string[]
      */
     private function processWildcard(array $data, bool $includeWildcard): array
@@ -179,6 +183,9 @@ final class Option
         return $this->checker;
     }
 
+    /**
+     * @return array<array<mixed>>
+     */
     public function getRules(): array
     {
         return $this->rules;
@@ -221,6 +228,9 @@ final class Option
         return implode(", ", $representatives);
     }
 
+    /**
+     * @return array<array<mixed>>
+     */
     public function getHelp(): array
     {
         return $this->help;
@@ -239,6 +249,10 @@ final class Option
         }
     }
 
+    /**
+     * @param array<mixed> $helpDescriptor
+     * @return array<array<mixed>>
+     */
     private function decodeHelp(array $helpDescriptor): array
     {
         $help = [[
@@ -285,6 +299,11 @@ final class Option
         return $help;
     }
 
+    /**
+     * @param array<string,mixed> &$opts
+     * @param array<string> $template
+     * @return array<string>
+     */
     private function pickOpts(array &$opts, array $template): array
     {
         $template = array_fill_keys($template, true);

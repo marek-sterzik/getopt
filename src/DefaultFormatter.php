@@ -7,6 +7,7 @@ class DefaultFormatter extends Formatter
     public const INDENT_LEVEL = 2;
     public const INDENT_CHAR = " ";
 
+    /** @var int */
     private $width = 120;
 
     public function formatHelp(string $argv0, ?string $args, ?string $options): string
@@ -19,6 +20,9 @@ class DefaultFormatter extends Formatter
         ]);
     }
 
+    /**
+     * @param array<array<mixed>> $options
+     */
     public function formatOptionsHelp(array $options): ?string
     {
         $rows = $this->getOptionRows($options);
@@ -29,6 +33,10 @@ class DefaultFormatter extends Formatter
         return $table->render($rows);
     }
 
+    /**
+     * @param array<array<mixed>> $options
+     * @return array<array<string>>
+     */
     private function getOptionRows(array $options): array
     {
         $rows = [];
@@ -133,6 +141,9 @@ class DefaultFormatter extends Formatter
         return $this->formatBlocks([[$caption, $description]]);
     }
 
+    /**
+     * @param array<array<mixed>> $blocks
+     */
     private function formatBlocks(array $blocks): string
     {
         return $this->formatBlocksRaw(array_map(function ($block) {
@@ -140,6 +151,9 @@ class DefaultFormatter extends Formatter
         }, $blocks), "\n");
     }
 
+    /**
+     * @param array<array<mixed>> $blocks
+     */
     private function formatBlocksRaw(array $blocks, string $delim): string
     {
         $output = "";

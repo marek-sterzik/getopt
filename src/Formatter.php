@@ -4,6 +4,7 @@ namespace SPSOstrov\GetOpt;
 
 abstract class Formatter implements FormatterInterface
 {
+    /** @var FormatterInterface|null */
     private static $formatter = null;
 
     public static function instance(?FormatterInterface $formatter = null): FormatterInterface

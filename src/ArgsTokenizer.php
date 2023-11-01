@@ -19,6 +19,10 @@ class ArgsTokenizer
         $this->errorOnBadOption = $options->getStrictMode();
     }
 
+    /**
+     * @param array<string> $args
+     * @return \Generator<array<mixed>>
+     */
     public function tokenize(array $args): iterable
     {
         $n = count($args);
