@@ -220,7 +220,7 @@ class OptionParser
 
     private function isCheckerIdentifier(string $identifier): bool
     {
-        return preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*$/', $identifier);
+        return preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*$/', $identifier) ? true : false;
     }
 
     private function readHelp(): ?string

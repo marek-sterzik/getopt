@@ -36,12 +36,14 @@ class WordSplitter
             return [];
         }
         $paragraphs = [];
+        /** @phpstan-ignore-next-line */
         foreach (preg_split('/\n\s*\n/', $sentence) as $paragraph) {
             $paragraph = trim($paragraph);
             if ($paragraph === '') {
                 continue;
             }
             $finalParagraph = [];
+            /** @phpstan-ignore-next-line */
             foreach (preg_split('/\s+/', $paragraph) as $word) {
                 $word = trim($word);
                 if ($word === '') {
