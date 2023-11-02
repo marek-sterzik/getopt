@@ -194,7 +194,11 @@ class Options
         }
         if (empty($this->argMap)) {
             if ($this->defaultArgOption === null) {
-                $this->defaultArgOption = new Option((new OptionParser())->parse(self::DEFAULT_ARG_DEF));
+                $parsed = (new OptionParser())->parse(self::DEFAULT_ARG_DEF);
+                if (count($parsed) !== 1) {
+                    throw new Exception("Bug: invalid constant DEFAULT_ARG_DEF");
+                }
+                $this->defaultArgOption = new Option($parsed[0]);
             }
             $max = $this->defaultArgOption->getMax();
             if ($max !== null && $max < $argNumber) {
