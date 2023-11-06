@@ -81,7 +81,7 @@ class OptionTokenizer
                     $accIndex = $position;
                 }
             } elseif ($accType === "help") {
-                if ($char === "\n" || $char === "\r" || $char === "\\") {
+                if (in_array($char, ["\n", "\r", "\\", "[", "]"])) {
                     yield [$accType, $acc, $accIndex];
                     $accType = null;
                     $acc = '';
