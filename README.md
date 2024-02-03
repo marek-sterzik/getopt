@@ -11,7 +11,7 @@ This is a PHP getopt library with these design goals:
 Example:
 
 ```php
-use SPSOstrov\AppConsole\GetOpt\Options;
+use SPSOstrov\GetOpt\Options;
 
 $options = new Options([
     'r|regular-option               This is a regular option',
