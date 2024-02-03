@@ -112,9 +112,14 @@ class Options
         return $this;
     }
 
+    public function getArgv0(): string
+    {
+        return $this->argv0 ?? (isset($_SERVER['argv'][0]) ? $this->getRealArgv0($_SERVER['argv'][0]) : 'command');
+    }
+
     public function getHelpFormatted(?FormatterInterface $formatter = null): ?string
     {
-        $argv0 = $this->argv0 ?? (isset($_SERVER['argv'][0]) ? $this->getRealArgv0($_SERVER['argv'][0]) : 'command');
+        $argv0 = $this->getArgv0();
         $args = $this->getArgsHelpFormatted($formatter);
         $options = $this->getOptionsHelpFormatted($formatter);
         return Formatter::instance($formatter)->formatHelp($argv0, $args, $options);
