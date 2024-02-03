@@ -87,7 +87,7 @@ class ArgsParser
                 }
             }
             if ($message !== null) {
-                throw new ArgsException($message);
+                throw new ArgsLimitsException($message, $this->data);
             }
         }
     }

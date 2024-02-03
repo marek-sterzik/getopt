@@ -2,6 +2,8 @@
 
 namespace SPSOstrov\GetOpt;
 
+use Exception;
+
 class Options
 {
     public const ARG_NONE = Option::ARG_NONE;
