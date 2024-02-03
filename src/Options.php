@@ -114,10 +114,28 @@ class Options
 
     public function getHelpFormatted(?FormatterInterface $formatter = null): ?string
     {
-        $argv0 = $this->argv0 ?? (isset($_SERVER['argv'][0]) ? $_SERVER['argv'][0] : 'command');
+        $argv0 = $this->argv0 ?? (isset($_SERVER['argv'][0]) ? $this->getRealArgv0($_SERVER['argv'][0]) : 'command');
         $args = $this->getArgsHelpFormatted($formatter);
         $options = $this->getOptionsHelpFormatted($formatter);
         return Formatter::instance($formatter)->formatHelp($argv0, $args, $options);
+    }
+
+    private function getRealArgv0(string $argv0): string
+    {
+        if (strpos($argv0, '/') === false) {
+            return $argv0;
+        }
+        $dir = dirname($argv0);
+        $path = getenv("PATH");
+        if (!is_string($path)) {
+            return $argv0;
+        }
+        foreach (explode(":", $path) as $pathDir) {
+            if ($pathDir === $dir) {
+                return basename($argv0);
+            }
+        }
+        return $argv0;
     }
 
     public function getOptionsHelpFormatted(?FormatterInterface $formatter = null): ?string
