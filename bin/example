@@ -28,7 +28,7 @@ END;
 
 
 $options = new Options($options);
-$options->setStrictMode(true);
+$options->setStrictMode(true)->setGnuMode(true);
 
 echo $options->getHelpFormatted();
 

@@ -257,6 +257,12 @@ $options->setArgv0("some-command");
 // Default mode is strict.
 $options->setStrictMode(false);
 
+// Enable or disable the GNU mode of option parsing. When GNU mode enabled,
+// first non-option argument will not end up option parsing and an explicit `--` is
+// required to force all other arguments being understood as arguments (non-options)
+// Default mode is non-gnu.
+$options->setGnuMode(true);
+
 // Tune how the option with an optional parameter will be parsed. Lets assume we have
 // such option with optional argument -o. And the command arguments are "-o optional".
 // If standalone optional arguments are allowed, this will be understood as option

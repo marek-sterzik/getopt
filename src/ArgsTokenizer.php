@@ -13,10 +13,14 @@ class ArgsTokenizer
     /** @var bool */
     private $errorOnBadOption;
 
+    /** @var bool */
+    private $gnuMode;
+
     public function __construct(Options $options)
     {
         $this->options = $options;
         $this->errorOnBadOption = $options->getStrictMode();
+        $this->gnuMode = $options->getGnuMode();
     }
 
     /**
@@ -31,20 +35,27 @@ class ArgsTokenizer
         $state = "init";
         $optionsFinished = false;
         $stateOption = null;
+        $scanOpt = true;
         while ($index < $n && !$optionsFinished) {
             $currentArg = substr($args[$index], $optIndex);
             if ($state === "init") {
-                if ($currentArg == '--') {
+                if ($scanOpt && $currentArg == '--') {
                     $optionsFinished = true;
                     $index++;
-                } elseif (substr($currentArg, 0, 2) == '--') {
+                } elseif ($scanOpt && substr($currentArg, 0, 2) == '--') {
                     $optIndex += 2;
                     $state = 'long';
-                } elseif (substr($currentArg, 0, 1) == '-') {
+                } elseif ($scanOpt && substr($currentArg, 0, 1) == '-') {
                     $optIndex += 1;
                     $state = "short";
                 } else {
-                    $optionsFinished = true;
+                    if ($this->gnuMode) {
+                        yield ["arg", $args[$index], null, $index];
+                        $index++;
+                        $scanOpt = true;
+                    } else {
+                        $optionsFinished = true;
+                    }
                 }
             } elseif ($state === 'short') {
                 $noArgOptions = [];
@@ -81,7 +92,7 @@ class ArgsTokenizer
                         return;
                     }
                     $optIndex = 0;
-                    $optionsFinished = true;
+                    $scanOpt = false;
                     $state = "init";
                 } else {
                     foreach ($noArgOptions as $opt) {
@@ -130,7 +141,7 @@ class ArgsTokenizer
                         return;
                     }
                     $optIndex = 0;
-                    $optionsFinished = true;
+                    $scanOpt = false;
                     $state = "init";
                 } elseif ($argType === Option::ARG_NONE || $argument !== null) {
                     yield ["option", $option, $argument, $index];

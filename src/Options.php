@@ -29,6 +29,9 @@ class Options
     private $strictMode = true;
 
     /** @var bool */
+    private $gnuMode = false;
+
+    /** @var bool */
     private $standaloneOptionalArgAllowed = false;
 
     /** @var array<string,int>|null */
@@ -43,6 +46,7 @@ class Options
     public function __construct($options, bool $strictMode = true, bool $standaloneOptionalArgAllowed = false)
     {
         $this->strictMode = $strictMode;
+        $this->gnuMode = false;
         $this->standaloneOptionalArgAllowed = $standaloneOptionalArgAllowed;
         $this->registerOptions($options);
     }
@@ -189,6 +193,17 @@ class Options
     public function setStrictMode(bool $strictMode = true): self
     {
         $this->strictMode = $strictMode;
+        return $this;
+    }
+
+    public function getGnuMode(): bool
+    {
+        return $this->gnuMode;
+    }
+
+    public function setGnuMode(bool $gnuMode = true): self
+    {
+        $this->gnuMode = $gnuMode;
         return $this;
     }
 
